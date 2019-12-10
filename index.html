@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="white">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>JumpDragon</title>
+    <link href="" rel="icon">
+    <link rel="stylesheet" type="text/css" href="../resource/css/reset.css">
+    <link href="./img/logo120.png" rel="apple-touch-icon"> 
+    <script src="./resource/js/easeljs-0.8.2.js"></script>
+    <script src="./resource/js/preloadjs-0.6.2.js"></script>
+    <script src="./resource/js/tweenjs-0.6.2.js"></script>
+    <script src="./resource/js/soundjs-0.6.2.js"></script>
+    <script src="./resource/js/ndgmr.Collision.js"></script>
+    <style>
+        body{
+            position: relative;
+            margin:0;
+            padding:0;
+        }
+    </style>
+  </head>
+<body>
+    <div style="display:none">
+        <img src="./img/logo300.png">
+    </div>
+	<canvas id="canvas"></canvas>
+<script id="bdstat">
+// var ua = navigator.userAgent.toLowerCase();
+// var isMobile = false;
+var window_width, window_height;
+var canvas_width,canvas_height;
+// if(ua.indexOf("iphone")>-1||ua.indexOf("android")>-1||ua.indexOf("lumia")>-1){
+//     isMobile = true;
+//     startMobileStyle();
+// }
+if(typeof window.orientation !== 'undefined'){
+    window.addEventListener("orientationchange",function(){
+        window.location.reload();
+    });
+}
+setCanvasSize();
+function setCanvasSize(){
+    window_width = document.documentElement.clientWidth;
+    window_height= document.documentElement.clientHeight;
+    // window_height = window_height>500?500:window_height;
+    document.getElementById("canvas").width = 2*window_width;
+    document.getElementById("canvas").height = 2*window_height;
+    document.getElementById("canvas").style.width = window_width+"px";
+    document.getElementById("canvas").style.height = window_height+"px";
+    console.log("window_width:"+window_width+" ,window_height:"+window_height);
+}
+function startMobileStyle(){
+    document.body.style.transform = "rotate(90deg)";
+    document.body.style.WebkitTransform = "rotate(90deg)";
+    document.body.style.MsTransform = "rotate(90deg)";
+    canvas_width = window_height;
+    canvas_height = window_width;
+}
+</script>
+<script src="./js/Dragon.js"></script>
+<script src="./js/Cacti.js"></script>
+<script src="./js/Bird.js"></script>
+<script src="./js/Character.js"></script>
+<script src="./js/grade.js"></script>
+<script src="./js/background.js"></script>
+<script src="./js/JumpDragon.js"></script>   
+</body>
+</html>

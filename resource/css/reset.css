@@ -1,0 +1,86 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+body,
+div,
+a,
+h3,
+p,
+dd,
+dl,
+dt,
+ul {
+  padding: 0;
+  margin: 0;
+}
+body,
+input,
+button {
+  background-color: #fff;
+  color: #555;
+  font-family: "Microsoft YaHei", "微软雅黑", "Open Sans", "Helvetica Neue", Helvetica, Arial, STHeiti, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+  margin: 0 auto;
+  font-weight: 300;
+  -webkit-appearance: none ;
+}
+textarea {
+  font-family: segoe;
+  -webkit-appearance: none ;
+}
+input,
+textarea {
+  border-radius: 0;
+  outline: none;
+}
+i {
+  font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, STHeiti, sans-serif;
+  font-size: normal;
+}
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  -webkit-appearance: none;
+}
+input::-ms-clear {
+  display: none;
+}
+img {
+  border: 0;
+}
+/*
+chrome自动填充bug
+*/
+*[id^='xunlei'] {
+  display: none;
+}
+a {
+  text-decoration: none;
+  outline: none;
+  color: inherit;
+}
+a:hover {
+  text-decoration: none;
+  cursor: pointer;
+}
+a:visited {
+  color: inherit;
+}
+.clear {
+  clear: both;
+}
+.floatleft {
+  float: left;
+}
+.floatright {
+  float: right;
+}
+input:-webkit-autofill {
+  background-color: none;
+  background-image: none;
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+  color: #000;
+}
