@@ -39,21 +39,23 @@
 		this.initY = GameParams.groundHeight-this.getBounds().height+GameParams.groundInsert;
 		this.isJump = false;
 		this.canDoubleJump = true;  // 是否可以二次跳跃
+		this.jumpPressed = false;   // 记录跳跃键是否被按下
 		this.init = function(){
 			this.y = this.initY;
 			this.x = GameParams.dragonX;
 			this.vy = 0;
 			this.isJump = false;
 			this.canDoubleJump = true;  // 重置二次跳跃状态
+			this.jumpPressed = false;   // 重置跳跃键状态
 		};
 		this.jump = function(isDoubleJump = false){
 			if (!isDoubleJump) {
-				this.vy = -GameParams.jumpVelocity;
+				this.vy = -GameParams.jumpVelocity * 0.8;  // 降低第一次跳跃的高度
 				this.gotoAndPlay("idle");
 				this.isJump = true;
 				this.canDoubleJump = true;  // 允许二次跳跃
 			} else if (this.canDoubleJump) {
-				this.vy = -GameParams.jumpVelocity * 0.9;  // 二次跳跃高度略低
+				this.vy = -GameParams.jumpVelocity * 0.7;  // 二次跳跃高度为第一次的70%
 				this.canDoubleJump = false;  // 使用掉二次跳跃机会
 			}
 		};
@@ -68,14 +70,20 @@
 				this.isJump = false;
 				this.canDoubleJump = true;  // 落地后重置二次跳跃
 			}
-			if(CMD_jump){
+			
+			// 处理跳跃输入
+			if(CMD_jump && !this.jumpPressed) {  // 只在按键按下时触发
+				this.jumpPressed = true;  // 标记按键已按下
 				if(!this.isJump){
 					this.jump(false);  // 第一次跳跃
 				} else if (this.canDoubleJump) {
 					this.jump(true);  // 二次跳跃
 				}
+			} else if (!CMD_jump) {
+				this.jumpPressed = false;  // 按键释放时重置状态
 			}
-			else if(CMD_bend&&!this.isJump){
+			
+			if(CMD_bend&&!this.isJump){
 				this.currentAnimation!="bend"&&this.gotoAndPlay("bend");
 			}
 			else if(CMD_bend){
