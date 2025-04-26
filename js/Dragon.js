@@ -37,16 +37,25 @@
 		// this.filters = [blur];
 		// this.cache(0,0,this.getBounds().width,this.getBounds().height);
 		this.initY = GameParams.groundHeight-this.getBounds().height+GameParams.groundInsert;
-		var isJump = false;
+		this.isJump = false;
+		this.canDoubleJump = true;  // 是否可以二次跳跃
 		this.init = function(){
 			this.y = this.initY;
 			this.x = GameParams.dragonX;
 			this.vy = 0;
+			this.isJump = false;
+			this.canDoubleJump = true;  // 重置二次跳跃状态
 		};
-		this.jump = function(){
-			this.vy = -GameParams.jumpVelocity;
-			this.gotoAndPlay("idle");
-			isJump = true;
+		this.jump = function(isDoubleJump = false){
+			if (!isDoubleJump) {
+				this.vy = -GameParams.jumpVelocity;
+				this.gotoAndPlay("idle");
+				this.isJump = true;
+				this.canDoubleJump = true;  // 允许二次跳跃
+			} else if (this.canDoubleJump) {
+				this.vy = -GameParams.jumpVelocity * 0.8;  // 二次跳跃高度略低
+				this.canDoubleJump = false;  // 使用掉二次跳跃机会
+			}
 		};
 		this.update = function(){
 			this.y += this.vy;
@@ -56,19 +65,24 @@
 			else{
 				this.vy = 0;
 				this.y = this.initY;
-				isJump = false;
+				this.isJump = false;
+				this.canDoubleJump = true;  // 落地后重置二次跳跃
 			}
-			if((CMD_jump)&&!isJump){
-				this.jump();
+			if(CMD_jump){
+				if(!this.isJump){
+					this.jump(false);  // 第一次跳跃
+				} else if (this.canDoubleJump) {
+					this.jump(true);  // 二次跳跃
+				}
 			}
-			else if(CMD_bend&&!isJump){
+			else if(CMD_bend&&!this.isJump){
 				this.currentAnimation!="bend"&&this.gotoAndPlay("bend");
 			}
 			else if(CMD_bend){
 				this.vy = GameParams.jumpVelocity*0.8;
 			}
 			else{
-				this.currentAnimation!="run"&&!isJump&&this.gotoAndPlay("run");
+				this.currentAnimation!="run"&&!this.isJump&&this.gotoAndPlay("run");
 			}
 		};
 		this.init();

@@ -1,7 +1,9 @@
 var KEYCODE_SPACE = 32;    
 var KEYCODE_UP = 38;
 var KEYCODE_DOWN = 40;
-var KEYCODE_W = 87,KEYCODE_S = 83;
+var KEYCODE_W = 87;
+var KEYCODE_S = 83;
+var KEYCODE_J = 74;
 // var KEYDOWN_SPACE = KEYDOWN_UP = KEYDOWN_DOWN = false;
 var CMD_jump = false;
 var CMD_bend = false;
@@ -25,8 +27,8 @@ var willRefreshGameParams = false;
 var GameParamsInit = function() {
     this.width= stage.canvas.width;
     this.height= stage.canvas.height;
-    this.gravity= 1.5;
-    this.jumpVelocity= 23;
+    this.gravity= 1.2;
+    this.jumpVelocity= 25;
     this.groundHeight= 400;
     this.groundInsert=24;
     this.velocity=12;
@@ -147,11 +149,20 @@ function showGameOverPanel(){
 }
 function tick(){
     if(!IsGameOver){
-        // willRefreshGameParams&&refreshGameParams();
-        dragon.update();
-        Background.update();
-        checkCollision();
         stage.update();
+        dragon.update();
+        for(var i=0;i<obstacleArray.length;i++){
+            obstacleArray[i].x -= GameParams.velocity;
+            if(obstacleArray[i] instanceof Bird) {
+                obstacleArray[i].update();  // 更新鸟的位置
+            }
+            if(obstacleArray[i].x<-obstacleArray[i].getBounds().width){
+                stage.removeChild(obstacleArray[i]);
+                obstacleArray.splice(i,1);
+                i--;
+            }
+        }
+        checkCollision();
     }
 }
 function refreshGameParams(){
@@ -169,6 +180,9 @@ function handleKeyDown(e) {
         	CMD_jump = true;
         	break;
         case KEYCODE_W:
+            CMD_jump = true;
+            break;
+        case KEYCODE_J:
             CMD_jump = true;
             break;
         case KEYCODE_DOWN:
@@ -189,6 +203,9 @@ function handleKeyUp(e){
             CMD_jump = false;
             break;
         case KEYCODE_W:
+            CMD_jump = false;
+            break;
+        case KEYCODE_J:
             CMD_jump = false;
             break;
         case KEYCODE_DOWN:
@@ -247,7 +264,8 @@ function createCacti(){
 }
 function createBird(){
     var bird = new Bird(loader.getResult("bird"));
-    bird.y = GameParams.groundHeight-bird.getBounds().height-40*Random(0,2);
+    bird.originalY = GameParams.groundHeight-bird.getBounds().height-40*Random(0,2);
+    bird.y = bird.originalY;
     bird.x = GameParams.width;
     return bird;
 }
