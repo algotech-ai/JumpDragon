@@ -114,7 +114,6 @@ function overGame(){
     (typeof window.orientation !== 'undefined')&&(document.title="我在JumpDragon里跑了"+gradeContainer.getChildByName("GRADE").number+"分，最高"+gradeContainer.getChildByName("HI_GRADE").number+"分，敢来挑战吗？");
 }
 function restartGame(){
-    // debugger;
     GameOverContainer.visible = false;
     IsGameOver = false;
     GameParams = new GameParamsInit(); 
@@ -125,6 +124,7 @@ function restartGame(){
     gradeContainer.startGradeUpdate(true);
     sendObstacle();
     dragon.init();
+    stage.update();  // 确保舞台更新
 }
 function showGameOverPanel(){
     if(!GameOverContainer){
@@ -143,9 +143,9 @@ function showGameOverPanel(){
         });
         
         stage.addChild(GameOverContainer);
-        stage.update();
     }
     GameOverContainer.visible = true;
+    stage.update();  // 确保舞台更新
 }
 function tick(){
     if(!IsGameOver){
