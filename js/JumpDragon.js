@@ -31,7 +31,7 @@ var GameParamsInit = function() {
     this.jumpVelocity= 25;
     this.groundHeight= 400;
     this.groundInsert=24;
-    this.velocity=12;
+    this.velocity=8;
     this.level=1;
     this.dragonX=100;
 };
@@ -270,7 +270,7 @@ function createBird(){
     return bird;
 }
 function setGameDiffi(level){
-    GameParams.velocity = 11 + level;
+    GameParams.velocity = 8 + level * 0.5;
 }
 
 

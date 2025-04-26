@@ -53,7 +53,7 @@
 				this.isJump = true;
 				this.canDoubleJump = true;  // 允许二次跳跃
 			} else if (this.canDoubleJump) {
-				this.vy = -GameParams.jumpVelocity * 0.8;  // 二次跳跃高度略低
+				this.vy = -GameParams.jumpVelocity * 0.9;  // 二次跳跃高度略低
 				this.canDoubleJump = false;  // 使用掉二次跳跃机会
 			}
 		};
