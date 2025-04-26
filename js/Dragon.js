@@ -40,6 +40,8 @@
 		this.isJump = false;
 		this.canDoubleJump = true;  // 是否可以二次跳跃
 		this.jumpPressed = false;   // 记录跳跃键是否被按下
+		this.autoDodge = true;      // 是否启用自动躲避
+		this.dodgeDistance = 300;   // 检测障碍物的距离
 		this.init = function(){
 			this.y = this.initY;
 			this.x = GameParams.dragonX;
@@ -57,6 +59,28 @@
 			} else if (this.canDoubleJump) {
 				this.vy = -GameParams.jumpVelocity * 0.7;  // 二次跳跃高度为第一次的70%
 				this.canDoubleJump = false;  // 使用掉二次跳跃机会
+			}
+		};
+		this.checkObstacles = function(obstacles) {
+			if (!this.autoDodge) return;
+			
+			for (var i = 0; i < obstacles.length; i++) {
+				var obstacle = obstacles[i];
+				// 检查障碍物是否在检测范围内
+				if (obstacle.x - this.x < this.dodgeDistance && obstacle.x - this.x > 0) {
+					// 如果是鸟，需要跳跃躲避
+					if (obstacle instanceof Bird) {
+						if (!this.isJump) {
+							this.jump(false);
+						} else if (this.canDoubleJump && this.y > obstacle.y + obstacle.getBounds().height) {
+							this.jump(true);
+						}
+					}
+					// 如果是仙人掌，需要下蹲躲避
+					else if (!this.isJump) {
+						CMD_bend = true;
+					}
+				}
 			}
 		};
 		this.update = function(){

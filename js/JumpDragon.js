@@ -151,6 +151,7 @@ function tick(){
     if(!IsGameOver){
         stage.update();
         dragon.update();
+        dragon.checkObstacles(obstacleArray);
         for(var i=0;i<obstacleArray.length;i++){
             obstacleArray[i].x -= GameParams.velocity;
             if(obstacleArray[i] instanceof Bird) {
