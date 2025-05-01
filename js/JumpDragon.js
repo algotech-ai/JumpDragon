@@ -77,7 +77,6 @@ function startGame(){
         if(stageEventListener.mousedown&&!IsGameOver){
             stageEventListener.pressmove = true;
             stageEventListener.endY = e.localY;
-            console.log(stageEventListener.endY, stageEventListener.startY)
             if(stageEventListener.endY>stageEventListener.startY+0.5){
                 CMD_bend = true;
                 CMD_jump = false;
@@ -93,13 +92,16 @@ function startGame(){
         CMD_bend = false;
         CMD_jump = false;
     });
-	dragon = new Dragon(loader.getResult("dragon"));
+    dragon = new Dragon(loader.getResult("dragon"));
     createGrade();
     gradeContainer.startGradeUpdate();
     createBackground();
     sendObstacle();
-    stage.addChild(dragon,text); 
-	createjs.Ticker.addEventListener("tick",tick);
+    
+    // 先添加其他元素
+    stage.addChild(dragon, text);
+    
+    createjs.Ticker.addEventListener("tick",tick);
     createjs.Ticker.setFPS(60);
 }
 function overGame(){
@@ -114,6 +116,21 @@ function overGame(){
     (typeof window.orientation !== 'undefined')&&(document.title="我在JumpDragon里跑了"+gradeContainer.getChildByName("GRADE").number+"分，最高"+gradeContainer.getChildByName("HI_GRADE").number+"分，敢来挑战吗？");
 }
 function restartGame(){
+    // 重置夜晚模式状态
+    if (window.nightModeTimer) {
+        clearTimeout(window.nightModeTimer);
+    }
+    window.isInverted = false;
+    window.nightModeActivated = false;
+    
+    // 确保画布恢复正常颜色
+    var canvasElement = document.getElementById("canvas");
+    document.body.style.backgroundColor = "white";
+    canvasElement.style.backgroundColor = "white";
+    canvasElement.style.filter = "none";
+    canvasElement.style.transform = "none";
+    
+    // 原有的重启游戏逻辑
     GameOverContainer.visible = false;
     IsGameOver = false;
     GameParams = new GameParamsInit(); 
@@ -149,7 +166,6 @@ function showGameOverPanel(){
 }
 function tick(){
     if(!IsGameOver){
-        stage.update();
         dragon.update();
         for(var i=0;i<obstacleArray.length;i++){
             obstacleArray[i].x -= GameParams.velocity;
@@ -163,6 +179,36 @@ function tick(){
             }
         }
         checkCollision();
+        
+        // 检查当前分数
+        var currentScore = 0;
+        if (gradeContainer && gradeContainer.getChildByName("GRADE")) {
+            var scoreText = gradeContainer.getChildByName("GRADE").text;
+            currentScore = parseInt(scoreText.replace(/^0+/, '') || '0');
+        }
+        
+        // 基于分数控制夜晚模式
+        if (currentScore >= window.nightModeScoreThreshold && !window.nightModeActivated) {
+            window.nightModeActivated = true;
+            console.log("达到夜晚模式分数阈值：" + currentScore);
+            
+            // 进入夜晚模式
+            window.toggleDragonColor(true);
+            
+            // 设置定时器，在指定时间后切换回白天模式
+            window.nightModeTimer = setTimeout(function() {
+                window.toggleDragonColor(false);
+                
+                // 再次设置定时器，在更长时间后允许再次进入夜晚模式
+                setTimeout(function() {
+                    window.nightModeActivated = false;
+                    console.log("允许再次进入夜晚模式");
+                }, window.dayModeDuration); // 使用更长的白天持续时间
+            }, window.nightModeDuration);
+        }
+        
+        // 确保在每一帧的最后更新舞台
+        stage.update();
     }
 }
 function refreshGameParams(){
@@ -172,6 +218,12 @@ function refreshGameParams(){
 }
 function handleKeyDown(e) {
     if (!e) { var e = window.event; }
+    
+    // 防止空格键的默认行为（通常是滚动页面）
+    if (e.keyCode === KEYCODE_SPACE) {
+        e.preventDefault();
+    }
+    
     switch (e.keyCode) {
     	case KEYCODE_SPACE:
         	CMD_jump = true;
@@ -217,14 +269,96 @@ function handleKeyUp(e){
     }
 }
 
+// 定义变色相关变量
+window.isInverted = false;
+window.nightModeActivated = false;
+window.nightModeTimer = null;
+window.nightModeDuration = 30000; // 夜晚持续时间，从10秒增加到30秒
+window.dayModeDuration = 30000;   // 白天持续时间，30秒，增加了时间间隔
+window.nightModeScoreThreshold = 400; // 进入夜晚模式的分数阈值
+
+// 添加颜色反转功能
+window.toggleDragonColor = function(forceState) {
+    console.log("切换颜色模式");
+    
+    // 如果传入了强制状态，则使用该状态，否则切换当前状态
+    if (typeof forceState === 'boolean') {
+        window.isInverted = forceState;
+    } else {
+        window.isInverted = !window.isInverted;
+    }
+    
+    var canvasElement = document.getElementById("canvas");
+    
+    // 清除所有可能的过渡效果，防止干扰
+    canvasElement.style.transition = "none";
+    void canvasElement.offsetWidth; // 强制重排
+    
+    // 重新应用过渡效果
+    canvasElement.style.transition = "filter 1.5s ease, background-color 1.5s ease";
+    
+    // 立即应用样式变化
+    if (window.isInverted) {
+        console.log("进入夜晚模式");
+        document.body.style.backgroundColor = "black";
+        canvasElement.style.backgroundColor = "black";
+        canvasElement.style.filter = "invert(100%)";
+    } else {
+        console.log("退出夜晚模式");
+        document.body.style.backgroundColor = "white";
+        canvasElement.style.backgroundColor = "white";
+        canvasElement.style.filter = "none";
+    }
+    
+    // 在过渡期间定期更新舞台
+    var transitionInterval = setInterval(function() {
+        if (stage) {
+            stage.update();
+        }
+    }, 100);
+    
+    // 过渡结束后清除定时器
+    setTimeout(function() {
+        clearInterval(transitionInterval);
+        if (stage) {
+            stage.update();
+        }
+        
+        // 确保过渡结束后滤镜已正确应用
+        if (window.isInverted) {
+            if (canvasElement.style.filter !== "invert(100%)") {
+                canvasElement.style.filter = "invert(100%)";
+                if (stage) stage.update();
+            }
+        }
+    }, 1600);
+}
+
+// 定义标记过渡状态的变量
+window.isTransitioning = false;
+
+// 页面加载完成后预先初始化filter属性
+window.addEventListener('load', function() {
+    var canvas = document.getElementById('canvas');
+    
+    // 预先应用一次filter属性然后立即移除，确保浏览器缓存该属性
+    canvas.style.filter = "invert(0%)";
+    
+    // 强制重绘
+    void canvas.offsetWidth;
+    
+    // 移除filter
+    canvas.style.filter = "none";
+});
+
 function sendObstacle(){
         var time = Math.floor(1200*Math.random()+600);
         var obstacle;
-        if(GameParams.level<5){
+        if(GameParams.level<2){
             obstacle = createCacti();
         }
         else{
-            var _subvalue = GameParams.level - 4;
+            var _subvalue = GameParams.level - 1;
             _subvalue = _subvalue>4?5:_subvalue;
             if(_subvalue>10*Math.random()){
                 obstacle = createBird();

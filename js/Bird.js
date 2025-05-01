@@ -26,7 +26,7 @@
 		this.flyOffset = 0;  // 当前偏移量
 		this.flyDirection = 1;  // 飞行方向（1向下，-1向上）
 		this.flySpeed = 0.5;  // 飞行速度
-		this.maxOffset = 10;  // 最大偏移量
+		this.maxOffset = 25;  // 最大偏移量，增加了上下移动幅度
 		
 		// 更新函数
 		this.update = function() {
